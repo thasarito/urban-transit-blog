@@ -32,6 +32,9 @@ export default function Mapbox(props) {
     if (mapRef) {
       new mapboxgl.Map({
         container: mapRef.current,
+        style: MAPSTYLE,
+        center: BANGKOK_CENTER,
+        zoom: 10,
       });
     }
   }, [mapRef]);

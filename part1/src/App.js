@@ -1,11 +1,11 @@
-import { useState } from 'react';
-
-import './App.css';
+import Mapbox from './components/mapbox';
 
 function App() {
-  const [viewport, setViewport] = useState();
-
-  return <div className="App"></div>;
+  return (
+    <div className="App">
+      <Mapbox />
+    </div>
+  );
 }
 
 export default App;
