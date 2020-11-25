@@ -18,7 +18,7 @@
 
 หลังจากนั้นสร้าง component ใหม่ `src/components/mapbox.js` หลังจากนั้นสร้าง element ที่จะเป็น container ของ mapbox หลังจากนั้นสร้าง reference ด้วย `useRef` เพื่อส่งไปให้ `Mapbox GL JS` ใช้ render แผนที่จาก mapbox
 
-โดยจะให้ render หลังจาก
+โดยจะให้ render หลังจากที่ได้ `mapRef` มาแล้ว หลังจากนั้นจัด style ให้ Mapbox ขยายเต็ม viewport
 
 ```javascript
 import React, { useEffect, useRef } from 'react';
@@ -65,4 +65,32 @@ export default function Mapbox(props) {
     </div>
   );
 }
+```
+
+### Adding D3js
+
+หลังจากนั้นเราจะใช้ `d3js` ในการวาดเส้นทางเดินรถไฟฟ้า และจุดตามสถานีต่างๆ ซึ่งการจะทำให้ Mapbox และ d3js สามารถแสดงผลแผนที่ให้สอดคล้องกันได้นั้น เราต้องทำให้ `d3js` รู้ถึง state ณ ปัจจุบันของ mapbox ดังนี้
+
+1. `Dimension` ประกอบด้วย width และ height ของ `mapRef`
+
+2. `Viewport` ประกอบด้วย latitude, longitude, และ zoom
+
+หลังจากนั้นเราจะใช้ 2 state นี้เป็น parameter การสร้าง `projection` สำหรับการวาดจุดสถานี และแผนที่
+
+#### Dimension State
+
+สร้าง dimension state และ eventlistener สำหรับอัพเดททุกครั้งเมื่อ resize
+
+```javascript
+  const [dimension, setDimension] = useState({ width: 300, height: 150 });
+  function resizeHandler() {
+    if (!mapRef) return;
+    const { width, height } = mapRef.current.getBoundingClientRect();
+    setDimension({ width, height });
+  }
+  ...
+  useEffect(() => {
+    ...
+    window.addEventListener('resize', resizeHandler);
+  }, [mapRef]);
 ```
