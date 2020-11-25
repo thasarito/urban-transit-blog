@@ -94,3 +94,34 @@ export default function Mapbox(props) {
     window.addEventListener('resize', resizeHandler);
   }, [mapRef]);
 ```
+
+#### Viewport State
+
+สร้าง Viewport State และส่งเป็น callback function ให้อัพเดททุกครั้งเมื่อ mapbox ขยับ และปิดฟังก์ชันหมุนแผนที่
+
+```javascript
+...
+  const [viewport, setViewport] = useState({
+    longitude: BANGKOK_CENTER[0],
+    latitude: BANGKOK_CENTER[1],
+    zoom: 10,
+  });
+  ...
+useEffect(() => {
+  ...
+    map.on('move', () => {
+      const { lng: longitude, lat: latitude } = map.getCenter();
+      const zoom = map.getZoom();
+
+      const newViewport = { latitude, longitude, zoom };
+      setViewport((prev) => ({ ...prev, ...newViewport }));
+    });
+
+    // disable map rotation using right click + drag
+    map.dragRotate.disable();
+
+    // disable map rotation using touch rotation gesture
+    map.touchZoomRotate.disableRotation();
+  }, [mapRef]);
+
+```

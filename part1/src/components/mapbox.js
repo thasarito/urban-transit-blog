@@ -10,6 +10,12 @@ mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
 let map;
 export default function Mapbox(props) {
   const mapRef = useRef(null);
+  const [viewport, setViewport] = useState({
+    longitude: BANGKOK_CENTER[0],
+    latitude: BANGKOK_CENTER[1],
+    zoom: 10,
+  });
+
   const [dimension, setDimension] = useState({ width: 300, height: 150 });
   function resizeHandler() {
     if (!mapRef) return;
@@ -26,7 +32,21 @@ export default function Mapbox(props) {
       center: BANGKOK_CENTER,
       zoom: 10,
     });
+
     window.addEventListener('resize', resizeHandler);
+
+    map.on('move', () => {
+      const { lng: longitude, lat: latitude } = map.getCenter();
+      const zoom = map.getZoom();
+
+      const newViewport = { latitude, longitude, zoom };
+      setViewport((prev) => ({ ...prev, ...newViewport }));
+    });
+    // disable map rotation using right click + drag
+    map.dragRotate.disable();
+
+    // disable map rotation using touch rotation gesture
+    map.touchZoomRotate.disableRotation();
   }, [mapRef]);
 
   return (
