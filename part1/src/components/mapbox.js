@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import mapboxgl from 'mapbox-gl';
 
@@ -10,6 +10,12 @@ mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
 let map;
 export default function Mapbox(props) {
   const mapRef = useRef(null);
+  const [dimension, setDimension] = useState({ width: 300, height: 150 });
+  function resizeHandler() {
+    if (!mapRef) return;
+    const { width, height } = mapRef.current.getBoundingClientRect();
+    setDimension({ width, height });
+  }
 
   useEffect(() => {
     if (!mapRef) return;
@@ -21,6 +27,8 @@ export default function Mapbox(props) {
       zoom: 10,
     });
     map.on('move', console.log);
+
+    window.addEventListener('resize', resizeHandler);
   }, [mapRef]);
 
   return (
