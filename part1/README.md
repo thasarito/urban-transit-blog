@@ -125,3 +125,30 @@ useEffect(() => {
   }, [mapRef]);
 
 ```
+
+#### Create Projection Function
+
+หลังจากนั้น install package d3-geo
+
+`npm i --save d3-geo`
+
+โดย Projection ที่ mapbox ใช้ คือ [geoMercator](https://docs.mapbox.com/help/glossary/projection/) ซึ่ง `d3js` มี Projection นี้มาให้ และเราจะอัพเดท projection นี้ทุกครั้งที่ `viewport` หรือ `dimension` เปลี่ยนด้วย `useMemo` hook
+
+_TODO: อธิบายความเชื่อมโยงของ Mapbox's zoom กับ projection.scale()_
+
+```javascript
+const { projection, path, scaler } = useMemo(() => {
+  const { latitude, longitude, zoom } = viewport;
+  const scale = ((512 * 0.5) / Math.PI) * Math.pow(2, zoom);
+
+  const projection = geoMercator()
+    .center([longitude, latitude])
+    .translate([dimension.width / 2, dimension.height / 2])
+    .scale(scale);
+
+  const path = geoPath(projection);
+
+  const scaler = Math.min(scale / 83443, 3);
+  return { projection, path, scaler };
+}, [dimension, viewport]);
+```
