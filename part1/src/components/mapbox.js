@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import mapboxgl from 'mapbox-gl';
 
@@ -10,30 +10,35 @@ mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
 let map;
 export default function Mapbox(props) {
   const mapRef = useRef(null);
-  const [dimension, setDimension] = useState({ width: 300, height: 150 });
-  function resizeHandler() {
-    if (!mapRef) return;
-    const { width, height } = mapRef.current.getBoundingClientRect();
-    setDimension({ width, height });
-  }
 
   useEffect(() => {
     if (!mapRef) return;
-    console.log('rendermap');
     map = new mapboxgl.Map({
       container: mapRef.current,
       style: MAPSTYLE,
       center: BANGKOK_CENTER,
       zoom: 10,
     });
-    map.on('move', console.log);
-
-    window.addEventListener('resize', resizeHandler);
   }, [mapRef]);
 
   return (
-    <div className="train-map" style={{ width: '100%', height: '100%' }}>
+    <div className="train-map">
       <div className="mapbox" ref={mapRef}></div>
+      <style jsx>{`
+        .train-map {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
+
+        .mapbox {
+          position: relative;
+          width: 100%;
+          height: 100%;
+        }
+      `}</style>
     </div>
   );
 }
