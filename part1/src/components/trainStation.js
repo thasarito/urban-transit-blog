@@ -10,7 +10,7 @@ export default function TrainStation(props) {
 
   return (
     <g className="station">
-      <circle cx={cx} cy={cy} r={5} fill="white" />
+      <circle cx={cx} cy={cy} r={3} fill="white" />
     </g>
   );
 }

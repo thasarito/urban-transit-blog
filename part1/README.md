@@ -363,6 +363,22 @@ export default function D3Map(props) {
 
 ```javascript
 // src/components/trainStation.js
+export default function TrainStation(props) {
+  const {
+    feature: {
+      geometry: { coordinates },
+    },
+    projection,
+  } = props;
+
+  const [cx, cy] = projection(coordinates);
+
+  return (
+    <g className="station">
+      <circle cx={cx} cy={cy} r={3} fill="white" />
+    </g>
+  );
+}
 ```
 
 โดยเราจะทำการ destructure `coordinates` ออกมาจาก `props` ที่รับมา แล้วส่ง coorinates นั้นไปให้ `projection` ซึ่งจะ `return` ตำแหน่งศูนย์กลางของสถานีนั้นๆ มาให้ `[cx, cy]` หลังจากนั้นก็นำตำแหน่งนั้นไปวาดวงกลมลงบน svg
