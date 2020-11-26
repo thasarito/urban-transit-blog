@@ -21,6 +21,7 @@ function App() {
       data.line = filterGeojson(response, (feature) =>
         feature.geometry.type.includes('LineString')
       );
+      console.log(data);
       setGeodata(data);
     });
   }, []);

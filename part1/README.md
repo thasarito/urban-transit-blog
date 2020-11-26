@@ -361,6 +361,8 @@ export default function D3Map(props) {
 }
 ```
 
+เริ่มจาก destructure `coordinates` ออกมาจาก `props` ที่รับมา แล้วส่ง coorinates นั้นไปให้ `projection` ซึ่งจะ `return` ตำแหน่งศูนย์กลางของสถานีนั้นๆ มาให้ `[cx, cy]` หลังจากนั้นก็นำตำแหน่งนั้นไปวาดวงกลมลงบน svg
+
 ```javascript
 // src/components/trainStation.js
 export default function TrainStation(props) {
@@ -381,4 +383,24 @@ export default function TrainStation(props) {
 }
 ```
 
-โดยเราจะทำการ destructure `coordinates` ออกมาจาก `props` ที่รับมา แล้วส่ง coorinates นั้นไปให้ `projection` ซึ่งจะ `return` ตำแหน่งศูนย์กลางของสถานีนั้นๆ มาให้ `[cx, cy]` หลังจากนั้นก็นำตำแหน่งนั้นไปวาดวงกลมลงบน svg
+#### Drawing Train Line
+
+คล้ายกันกรณีจุด การวาดเส้นเราจะใช้ฟังก์ชั่น `path` ที่ได้มาจากฟังก์ชั่น [`geoPath`](https://github.com/d3/d3-geo#paths) ซึ่งเป็น factory function ที่สร้างฟังก์ชั่นที่รับ `feature` แล้วสร้าง `definition` ของ svg `<path />` จาก `projection` ที่ได้รับ
+
+```javascript
+// src/components/trainLine.js
+
+export default function TrainLine(props) {
+  const { feature, path } = props;
+
+  const { stroke } = feature.properties;
+
+  const definition = path(feature);
+
+  return (
+    <g className="line">
+      <path d={definition} fill="transparent" stroke={stroke} strokeWidth={3} />
+    </g>
+  );
+}
+```
