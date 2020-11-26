@@ -238,7 +238,7 @@ function App() {
       const data = {};
       data.station = filterGeojson(
         response,
-        (feature) => feature.geometry === 'Point'
+        (feature) => feature.geometry.type === 'Point'
       );
 
       data.line = filterGeojson(response, (feature) =>
