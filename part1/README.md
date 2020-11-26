@@ -404,3 +404,5 @@ export default function TrainLine(props) {
   );
 }
 ```
+
+![Part 1 Result](./part1_result.png)
