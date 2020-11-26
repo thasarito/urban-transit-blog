@@ -223,6 +223,8 @@ GeoJSON เป็นมาตรฐานการเก็บข้อมูล
 
 หลังจากนั้นเนื่องจากในไฟล์ GeoJSON นี้มีทั้งเส้นทางเดินรถไฟ และสถานี เราจะแยกทั้งสองออกจากกัน ด้วยฟังก์ชั่น filterGeoJSON
 
+หลังจากนั้นก็ส่ง `geodata` เป็น props ผ่านไปให้ `<Mapbox geodata={geodata} />`
+
 ```javascript
 import { useEffect, useState } from 'react';
 
@@ -265,7 +267,7 @@ export default function filterGeojson(geojson, filter) {
 
 ต่อมาเราจะใช้ `projection` ที่ได้มาแปลงข้อมูล geographical เป็นตำแหน่ง pixel บนหน้าจอที่เชื่อมกับตำแหน่ง geographical นั้นๆ ใน Mapbox
 
-เริ่มจากสร้างไฟล์ Component `D3map` โดยจะรับ props 2 อย่าง คือ `dimension` และ `viewport`
+เริ่มจากสร้างไฟล์ Component `D3map` โดยจะรับ props 3 อย่าง คือ `geodata`, `dimension` และ `viewport`
 
 ```javascript
 function Mapbox() {
@@ -273,7 +275,7 @@ function Mapbox() {
 
   return (
     ...
-    <D3Map dimension={dimension} viewport={viewport} />
+    <D3Map geodata={geodata} dimension={dimension} viewport={viewport} />
     ...
   )
 }
@@ -285,7 +287,7 @@ import { useMemo } from 'react';
 import { geoMercator, geoPath } from 'd3-geo';
 
 export default function D3Map(props) {
-  const { dimension, viewport } = props;
+  const { geodata, dimension, viewport } = props;
 
   const { projection, path, scaler } = useMemo(() => {
     const { latitude, longitude, zoom } = viewport;

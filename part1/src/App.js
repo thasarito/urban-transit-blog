@@ -24,7 +24,7 @@ function App() {
 
   return (
     <div className="App">
-      <Mapbox />
+      <Mapbox geodata={geodata} />
       <style jsx>{`
         .App {
           width: 100vw;
