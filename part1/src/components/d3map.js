@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 
 import { geoMercator, geoPath } from 'd3-geo';
+import TrainStation from './trainStation';
 
 export default function D3Map(props) {
-  const { dimension, viewport } = props;
+  const { geodata, dimension, viewport } = props;
 
   const { projection, path, scaler } = useMemo(() => {
     const { latitude, longitude, zoom } = viewport;
@@ -22,11 +23,17 @@ export default function D3Map(props) {
 
   return (
     <svg>
+      {geodata.station.features.map(function (feature) {
+        return <TrainStation feature={feature} projection={projection} />;
+      })}
       <style jsx>{`
         svg {
-          width: ${dimension.width};
-          height: ${dimension.height};
+          width: ${dimension.width}px;
+          height: ${dimension.height}px;
           pointer-events: none;
+          position: absolute;
+          top: 0;
+          left: 0;
         }
       `}</style>
     </svg>

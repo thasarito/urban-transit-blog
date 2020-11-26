@@ -35,6 +35,7 @@ export default function Mapbox(props) {
       zoom: 10,
     });
 
+    resizeHandler();
     window.addEventListener('resize', resizeHandler);
 
     map.on('move', () => {

@@ -6,7 +6,10 @@ import Mapbox from './components/mapbox';
 import filterGeojson from './utils/filterGeojson';
 
 function App() {
-  const [geodata, setGeodata] = useState({ features: [] });
+  const [geodata, setGeodata] = useState({
+    station: { features: [] },
+    line: { features: [] },
+  });
   useEffect(() => {
     jsonRequest('/data/map.geo.json', function (response) {
       const data = {};

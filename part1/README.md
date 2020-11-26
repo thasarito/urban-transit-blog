@@ -79,7 +79,7 @@ export default function Mapbox(props) {
 
 #### Dimension State
 
-สร้าง dimension state และ eventlistener สำหรับอัพเดททุกครั้งเมื่อ resize
+สร้าง dimension state และ eventlistener สำหรับอัพเดททุกครั้งเมื่อ resize แล้ว resizeHandler 1 ครั้งเพื่ออัพเดท `width` และ `height`
 
 ```javascript
   const [dimension, setDimension] = useState({ width: 300, height: 150 });
@@ -91,6 +91,7 @@ export default function Mapbox(props) {
   ...
   useEffect(() => {
     ...
+    resizeHandler()
     window.addEventListener('resize', resizeHandler);
   }, [mapRef]);
 ```
@@ -308,12 +309,60 @@ export default function D3Map(props) {
     <svg>
       <style jsx>{`
         svg {
-          width: ${dimension.width};
-          height: ${dimension.height};
+          width: ${dimension.width}px;
+          height: ${dimension.height}px;
           pointer-events: none;
+          position: absolute;
+          top: 0;
+          left: 0;
         }
       `}</style>
     </svg>
   );
 }
 ```
+
+#### Drawing Station
+
+โดยในการวาดแต่ละสถานีลงไปบนแผนที่ เราจะใช้ข้อมูลจากใน `geodata.station` ที่เตรียมไว้ ส่งไปให้ Component ใหม่ชื่อ `trainStation`
+
+โดย Component นี้จะรับ feature ของแต่ละสถานีใน `geodata.station` และ `projection` สำหรับแปลงข้อมูล geographical ใน feature เป็นตำแหน่งบนหน้าจอสำหรับ render
+
+```json
+// ตัวอย่าง feature ที่จะส่งไปให้ Component trainStation
+{
+  "type": "Feature",
+  "properties": {
+    "stroke": null,
+    "stroke-width": null,
+    "id": null,
+    "brand": "ARL",
+    "line": "แอร์พอร์ต เรล ลิงก์ ",
+    "name": null,
+    "type": null,
+    "start": 2549,
+    "end": null,
+    "station": "บ้านทับช้าง",
+    "code": "A3",
+    "lng": 100.6908112,
+    "lat": 13.7329138,
+    "finish": 2553,
+    "district": "ประเวศ",
+    "zone": "ดำรงชีวิต",
+    "street": "ถนนคู่ขนานกรุงเทพฯ-ชลบุรี",
+    "51-54_min": "ไม่มีข้อมูล",
+    "51-54_max": "ไม่มีข้อมูล",
+    "55-58_min": "30,000",
+    "55-58_max": "30,000",
+    "59-62_min": "20,000",
+    "59-62_max": "32,000"
+  },
+  "geometry": { "type": "Point", "coordinates": [100.6908112, 13.7329138] }
+}
+```
+
+```javascript
+// src/components/trainStation.js
+```
+
+โดยเราจะทำการ destructure `coordinates` ออกมาจาก `props` ที่รับมา แล้วส่ง coorinates นั้นไปให้ `projection` ซึ่งจะ `return` ตำแหน่งศูนย์กลางของสถานีนั้นๆ มาให้ `[cx, cy]` หลังจากนั้นก็นำตำแหน่งนั้นไปวาดวงกลมลงบน svg
