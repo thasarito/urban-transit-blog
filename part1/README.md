@@ -152,3 +152,63 @@ const { projection, path, scaler } = useMemo(() => {
   return { projection, path, scaler };
 }, [dimension, viewport]);
 ```
+
+#### Introducing GeoJSON
+
+GeoJSON เป็นมาตรฐานการเก็บข้อมูล geographical รูปแบบหนึ่งใน JSON format โดยในไฟล์ GeoJSON จะเก็บข้อมูลไว้เป็น Collection ของ Feature ต่างๆ ใน features
+
+```json
+{
+  "type": "FeatureCollection",
+  "name": "bkk_subway",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "stroke": "#9BAE24",
+        "stroke-width": 2,
+        "id": "100",
+        "brand": "BTS",
+        "line": "สุขุมวิท",
+        "name": "รถไฟฟ้าบีทีเอส สายสุขุมวิท (สยาม → หมอชิต)",
+        "type": "route",
+        "start": 2535,
+        "end": 2542,
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [100.53423195737791, 13.745683374751117],
+          ...,
+          [100.55491895331066, 13.804474442914579]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "brand": "ARL",
+        "line": "แอร์พอร์ต เรล ลิงก์ ",
+        "name": null,
+        "type": null,
+        "start": 2549,
+        "end": null,
+        "station": "มักกะสัน",
+        "code": "A6",
+        "finish": 2553,
+        "district": "ราชเทวี",
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [100.56360289203926, 13.750432806958651]
+      }
+    }
+  ]
+}
+```
+
+โดยในแต่ละ Feature จะมี 2 properties หลัก คือ
+
+1. `properties` ไว้สำหรับเก็บข้อมูลต่างๆ ของ Feature นั้นๆ เช่น ชื่อสถานี
+
+2. `geometry` ไว้สำหรับเก็บข้อมูล geographical ของ Feature นั้น มีได้หลายชนิด โดยที่เราจะใช้มี 2 แบบ คือ `LineString` สำหรับสายรถไฟแต่ละสาย และ `Point` สำหรับตำแหน่งของสถานี
