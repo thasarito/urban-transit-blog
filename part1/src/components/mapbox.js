@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 
 import { BANGKOK_CENTER } from '../config';
+import D3Map from './d3map';
 const MAPSTYLE = 'mapbox://styles/mapbox/dark-v10';
 const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
@@ -51,7 +52,9 @@ export default function Mapbox(props) {
 
   return (
     <div className="train-map">
-      <div className="mapbox" ref={mapRef}></div>
+      <div className="mapbox" ref={mapRef}>
+        <D3Map dimension={dimension} viewport={viewport} />
+      </div>
       <style jsx>{`
         .train-map {
           position: fixed;

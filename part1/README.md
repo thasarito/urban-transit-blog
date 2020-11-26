@@ -212,3 +212,58 @@ GeoJSON เป็นมาตรฐานการเก็บข้อมูล
 1. `properties` ไว้สำหรับเก็บข้อมูลต่างๆ ของ Feature นั้นๆ เช่น ชื่อสถานี
 
 2. `geometry` ไว้สำหรับเก็บข้อมูล geographical ของ Feature นั้น มีได้หลายชนิด โดยที่เราจะใช้มี 2 แบบ คือ `LineString` สำหรับสายรถไฟแต่ละสาย และ `Point` สำหรับตำแหน่งของสถานี
+
+#### Using Projection to draw Map from GeoJSON
+
+ต่อมาเราจะใช้ `projection` ที่ได้มาแปลงข้อมูล geographical เป็นตำแหน่ง pixel บนหน้าจอที่เชื่อมกับตำแหน่ง geographical นั้นๆ ใน Mapbox
+
+เริ่มจากสร้างไฟล์ Component `D3map` โดยจะรับ props 2 อย่าง คือ `dimension` และ `viewport`
+
+```javascript
+function Mapbox() {
+  ...
+
+  return (
+    ...
+    <D3Map dimension={dimension} viewport={viewport} />
+    ...
+  )
+}
+```
+
+```javascript
+import { useMemo } from 'react';
+
+import { geoMercator, geoPath } from 'd3-geo';
+
+export default function D3Map(props) {
+  const { dimension, viewport } = props;
+
+  const { projection, path, scaler } = useMemo(() => {
+    const { latitude, longitude, zoom } = viewport;
+    const scale = ((512 * 0.5) / Math.PI) * Math.pow(2, zoom);
+
+    const projection = geoMercator()
+      .center([longitude, latitude])
+      .translate([dimension.width / 2, dimension.height / 2])
+      .scale(scale);
+
+    const path = geoPath(projection);
+
+    const scaler = Math.min(scale / 83443, 3);
+    return { projection, path, scaler };
+  }, [dimension, viewport]);
+
+  return (
+    <svg>
+      <style jsx>{`
+        svg {
+          width: ${dimension.width};
+          height: ${dimension.height};
+          pointer-events: none;
+        }
+      `}</style>
+    </svg>
+  );
+}
+```
