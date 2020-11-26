@@ -224,17 +224,29 @@ GeoJSON เป็นมาตรฐานการเก็บข้อมูล
 หลังจากนั้นเนื่องจากในไฟล์ GeoJSON นี้มีทั้งเส้นทางเดินรถไฟ และสถานี เราจะแยกทั้งสองออกจากกัน ด้วยฟังก์ชั่น filterGeoJSON
 
 ```javascript
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
+import { json as jsonRequest } from 'd3-request';
+
+import Mapbox from './components/mapbox';
+import filterGeojson from './utils/filterGeojson';
 
 function App() {
+  const [geodata, setGeodata] = useState({ features: [] });
+  useEffect(() => {
+    jsonRequest('/data/map.geo.json', function (response) {
+      const data = {};
+      data.station = filterGeojson(
+        response,
+        (feature) => feature.geometry === 'Point'
+      );
 
-const [geodata, setGeodata] = useState({features: []})
-useEffect(() => {
-  jsonRequest("/data/map.geo.json", function (response) {
-    const data = {};
-
-  })
-}, [])
+      data.line = filterGeojson(response, (feature) =>
+        feature.geometry.type.includes('LineString')
+      );
+      setGeodata(data);
+    });
+  }, []);
 ...
 }
 ```
