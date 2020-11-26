@@ -213,6 +213,42 @@ GeoJSON เป็นมาตรฐานการเก็บข้อมูล
 
 2. `geometry` ไว้สำหรับเก็บข้อมูล geographical ของ Feature นั้น มีได้หลายชนิด โดยที่เราจะใช้มี 2 แบบ คือ `LineString` สำหรับสายรถไฟแต่ละสาย และ `Point` สำหรับตำแหน่งของสถานี
 
+#### Request GeoJSON file
+
+ต่อมาเราจะ request ไฟล์แผนที่ GeoJSON มา ด้วย `d3-request`
+
+`npm i --save d3-request`
+
+โดยเราจะเก็บ file GeoJSON ไว้ใน state และใช้ `useEffect` ในการเรียก `jsonRequest` เมื่อ Component render เป็นครั้งแรก
+
+หลังจากนั้นเนื่องจากในไฟล์ GeoJSON นี้มีทั้งเส้นทางเดินรถไฟ และสถานี เราจะแยกทั้งสองออกจากกัน ด้วยฟังก์ชั่น filterGeoJSON
+
+```javascript
+import { useState, useEffect } from 'react';
+
+function App() {
+
+const [geodata, setGeodata] = useState({features: []})
+useEffect(() => {
+  jsonRequest("/data/map.geo.json", function (response) {
+    const data = {};
+
+  })
+}, [])
+...
+}
+```
+
+```javascript
+# utils/filterGeojson.js
+export default function filterGeojson(geojson, filter) {
+  return {
+    type: "FeatureCollection",
+    features: geojson.features.filter(filter),
+  };
+}
+```
+
 #### Using Projection to draw Map from GeoJSON
 
 ต่อมาเราจะใช้ `projection` ที่ได้มาแปลงข้อมูล geographical เป็นตำแหน่ง pixel บนหน้าจอที่เชื่อมกับตำแหน่ง geographical นั้นๆ ใน Mapbox
