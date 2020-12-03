@@ -1,5 +1,7 @@
 # Part 2 Moving between Station along Train track
 
+## 2.1 สร้างฟังก์ชั่นสำหรับสร้างเส้นทางเพื่อขยับกล้อง
+
 ในการขยับกล้องระหว่างสถานีหนึ่งไปอีกสถานีหนึ่ง สมมติเราต้องการจะขยับจากสถานี `stationA` ไปสถานีปลายทางที่ `stationC`
 
 ถ้าเราไม่ต้องการที่จะขยับระหว่างจุดของสถานี `stationA` ไป `stationC` เลย ในบางกรณีอาจจะต้องมีการเปลี่ยนสายระหว่างทางที่สถานี `stationB` เราจึงจะเก็บข้อมูลไว้ว่าต้องเดินทางอย่างไรในรูปแบบของ `Array` ที่มี `Object` ที่มี property ดังนี้
@@ -25,7 +27,7 @@ const routes = [
 
 ![line-station-relationship](./line-station.jpg)
 
-เราจะสร้างฟังก์ชั่นที่เปลี่ยนจาก `tracks` เป็น จุดบนเส้นทางรถไฟที่เชื่อมระหว่าง `stationA` กับ `stationC`
+เริ่มจากสร้างฟังก์ชั่นที่เปลี่ยนจาก `tracks` เป็น จุดบนเส้นทางรถไฟที่เชื่อมระหว่าง `stationA` กับ `stationC`
 
 1. แปลง `from`, `to`, และ `line` ในแต่ละ `track` ให้เป็น coordinates
 
@@ -69,7 +71,7 @@ export default function nameToCoords(directionsName, station, trainline) {
 }
 ```
 
-2. สร้างฟังก์ชั่นเพื่อแปลง `track` ให้กลายเป็นเส้นทางด้วยขั้นตอนตอนไปนี้
+2. สร้างฟังก์ชั่นเพื่อแปลง `track` ให้กลายเป็นเส้นทางด้วยขั้นตอนไปนี้
 
    1. หา index (`indexA`) ที่ใกล้ที่สุดของสถานี `from` กับจุดต่างๆ ใน `line`
    2. หา index (`indexB`) ที่ใกล้ที่สุดของสถานี `to` กับจุดต่างๆ ใน `line`
@@ -120,5 +122,34 @@ export default (station, line) =>
     return paths;
   };
 ```
+
+## 2.2 หาระยะทางระหว่างจุดที่ต่อกัน แล้วคำนวณเวลา
+
+เพื่อให้กล้องขยับด้วยความเร็วคงที่ เราจะตั้งตัวแปร `VELOCITY` ขึ้นมาเป็นค่าคงที่ แล้วเอาระยะทางของจุดที่ต่อกัน `DISTANCE` มาหาเวลาที่ `TIME (t)` ที่ต้องใช้ในการขยับกล้องแต่ละครั้ง
+
+```javascript
+// src/utils/createTravelPlan.js
+
+const VELOCITY = 1.5e-3;
+function createTravelPlan(paths) {
+  const plan = paths.map((currentCoordinate, i, coordinates) => {
+    const previousCoordinate = coordinates[i - 1];
+    if (!previousCoordinates) return { fn: () => {}, t: 1 };
+
+    const DISTANCE = distance(currentCoordinates, previousCoordinate),
+      TIME = DISTANCE / VELOCITY;
+
+    function movemap() {
+      map.panTo(coordinate, { duration: TIME, easing: (t) => t });
+    }
+    return {
+      movemap,
+      t: time,
+    };
+  });
+}
+```
+
+## 2.3 สร้างฟังก์ชั่นสำหรับเรียกหลายๆ ฟังก์ชั่นต่อๆ กัน
 
 ในส่วนของการขยับกล้องของ mapbox จะใช้ฟังก์ชั่น `panTo` ซึ่งจะสามารถขยับกล้องได้แค่จากจุดหนึ่งไปอีกจุดหนึ่งเท่านั้นใน 1 eventloop แต่เนื่องจากเราต้องการขยับตามเส้นทางเดินรถ ซึ่งจำนวนครั้งในการเรียกฟังก์ชั่นจะขึ้นอยู่กับจำนวนจุดในเส้นทางเดินรถระหว่างสถานีสองสถานี
