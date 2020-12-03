@@ -25,15 +25,60 @@ const routes = [
 
 ![line-station-relationship](./line-station.jpg)
 
-ในส่วนของการขยับกล้องของ mapbox จะใช้ฟังก์ชั่น `panTo` ซึ่งจะสามารถขยับกล้องได้แค่จากจุดหนึ่งไปอีกจุดหนึ่งเท่านั้นใน 1 eventloop แต่เนื่องจากเราต้องการขยับตามเส้นทางเดินรถ ซึ่งจำนวนครั้งในการเรียกฟังก์ชั่นจะขึ้นอยู่กับจำนวนจุดในเส้นทางเดินรถระหว่างสถานีสองสถานี
+เราจะสร้างฟังก์ชั่นที่เปลี่ยนจาก `tracks` เป็น จุดบนเส้นทางรถไฟที่เชื่อมระหว่าง `stationA` กับ `stationC`
 
-1. หา index (`indexA`) ที่ใกล้ที่สุดของสถานี `from` กับจุดต่างๆ ใน `line`
-
-2. หา index (`indexB`) ที่ใกล้ที่สุดของสถานี `to` กับจุดต่างๆ ใน `to`
-
-3. คืน `Array` ที่เป็นจุดระหว่าง `indexA` และ `indexB`
+1. แปลง `from`, `to`, และ `line` ในแต่ละ `track` ให้เป็น coordinates
 
 ```javascript
+// src/utils/nameToCoords.js
+import flatten from '@turf/flatten';
+
+export default function nameToCoords(directionsName, station, trainline) {
+  /*
+  [
+    {
+      from: Ari,
+      to: Siam,
+      line: 101
+    }
+  ]
+  */
+  const direction = directionsName.map((direction) => {
+    const { from, to, line } = direction;
+
+    const {
+      geometry: { coordinates: fromCoord },
+    } = station.features.find(({ properties: { code } }) => code === from);
+    const {
+      geometry: { coordinates: toCoord },
+    } = station.features.find(({ properties: { code } }) => code === to);
+    const {
+      features: [
+        {
+          geometry: { coordinates: lineCoord },
+        },
+      ],
+    } = flatten(
+      trainline.features.find(({ properties: { id } }) => id === line)
+    );
+
+    return { from: fromCoord, to: toCoord, line: lineCoord };
+  });
+
+  return direction;
+}
+```
+
+2. สร้างฟังก์ชั่นเพื่อแปลง `track` ให้กลายเป็นเส้นทางด้วยขั้นตอนตอนไปนี้
+
+   1. หา index (`indexA`) ที่ใกล้ที่สุดของสถานี `from` กับจุดต่างๆ ใน `line`
+   2. หา index (`indexB`) ที่ใกล้ที่สุดของสถานี `to` กับจุดต่างๆ ใน `line`
+   3. คืน `Array` ที่เป็นจุดระหว่าง `indexA` และ `indexB`
+
+3. รวม `path` ที่ได้มาจาก แต่ละ `track` เป็นเส้นเดียวกันด้วย `Array.reduce`
+
+```javascript
+// src/utils/findPathBetweenStation.js
 import findNearestIdx from './findNearestIdx';
 import nameToCoords from './nameToCoords';
 
@@ -75,3 +120,5 @@ export default (station, line) =>
     return paths;
   };
 ```
+
+ในส่วนของการขยับกล้องของ mapbox จะใช้ฟังก์ชั่น `panTo` ซึ่งจะสามารถขยับกล้องได้แค่จากจุดหนึ่งไปอีกจุดหนึ่งเท่านั้นใน 1 eventloop แต่เนื่องจากเราต้องการขยับตามเส้นทางเดินรถ ซึ่งจำนวนครั้งในการเรียกฟังก์ชั่นจะขึ้นอยู่กับจำนวนจุดในเส้นทางเดินรถระหว่างสถานีสองสถานี
