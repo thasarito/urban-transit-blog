@@ -103,6 +103,24 @@ export default function nameToCoords(directionsName, station, trainline) {
 
   return direction;
 }
+
+// src/App.js
+const routes = nameToCoords(
+  [
+    {
+      from: ARI,
+      to: SIAM,
+      line: SUKHUMVIT0,
+    },
+    {
+      from: SIAM,
+      to: SALADAENG,
+      line: SILOMLINE1,
+    },
+  ],
+  geodata.station,
+  geodata.line
+);
 ```
 
 2. สร้างฟังก์ชั่นเพื่อแปลง `track` ให้กลายเป็นเส้นทางด้วยขั้นตอนไปนี้

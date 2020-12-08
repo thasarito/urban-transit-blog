@@ -4,6 +4,7 @@ import { json as jsonRequest } from 'd3-request';
 
 import Mapbox from './components/mapbox';
 import filterGeojson from './utils/filterGeojson';
+import nameToCoords from './utils/nameToCoords';
 
 const SIAM = 'CEN',
   ARI = 'N5',
@@ -33,18 +34,23 @@ function App() {
   }, []);
 
   function AriToSilom() {
-    const routes = [
-      {
-        from: ARI,
-        to: SIAM,
-        line: SUKHUMVIT0,
-      },
-      {
-        from: SIAM,
-        to: SALADAENG,
-        line: SILOMLINE1,
-      },
-    ];
+    const routes = nameToCoords(
+      [
+        {
+          from: ARI,
+          to: SIAM,
+          line: SUKHUMVIT0,
+        },
+        {
+          from: SIAM,
+          to: SALADAENG,
+          line: SILOMLINE1,
+        },
+      ],
+      geodata.station,
+      geodata.line
+    );
+    console.log(routes);
   }
 
   return (
