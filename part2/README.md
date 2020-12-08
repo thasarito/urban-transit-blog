@@ -1,5 +1,24 @@
 # Part 2 Moving between Station along Train track
 
+เริ่มจากสร้างปุ่มใน `App.js` สำหรับขยับจากสถานี `Ari` ไปสู่ `Silom`
+
+```javascript
+// src/App.js
+...
+function App() {
+  ...
+  function AriToSilom() {}
+  ...
+  <div className="App">
+    <div className="controller">
+      <button onClick={AriToSilom}>Ari to Silom</button>
+    </div>
+    ...
+  </div>
+...
+}
+```
+
 ## 2.1 สร้างฟังก์ชั่นสำหรับสร้างเส้นทางเพื่อขยับกล้อง
 
 ในการขยับกล้องระหว่างสถานีหนึ่งไปอีกสถานีหนึ่ง สมมติเราต้องการจะขยับจากสถานี `stationA` ไปสถานีปลายทางที่ `stationC`
