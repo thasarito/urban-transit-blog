@@ -34,7 +34,7 @@ function App() {
   }, []);
 
   function AriToSilom() {
-    const routes = nameToCoords(
+    const tracks = nameToCoords(
       [
         {
           from: ARI,
@@ -50,7 +50,7 @@ function App() {
       geodata.station,
       geodata.line
     );
-    console.log(routes);
+    console.log(tracks);
   }
 
   return (
