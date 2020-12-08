@@ -5,6 +5,12 @@ import { json as jsonRequest } from 'd3-request';
 import Mapbox from './components/mapbox';
 import filterGeojson from './utils/filterGeojson';
 
+const SIAM = 'CEN',
+  ARI = 'N5',
+  SALADAENG = 'S2';
+
+const SUKHUMVIT0 = '100',
+  SILOMLINE1 = '201';
 function App() {
   const [geodata, setGeodata] = useState({
     station: { features: [] },
@@ -26,7 +32,20 @@ function App() {
     });
   }, []);
 
-  function AriToSilom() {}
+  function AriToSilom() {
+    const routes = [
+      {
+        from: ARI,
+        to: SIAM,
+        line: SUKHUMVIT0,
+      },
+      {
+        from: SIAM,
+        to: SALADAENG,
+        line: SILOMLINE1,
+      },
+    ];
+  }
 
   return (
     <div className="App">
