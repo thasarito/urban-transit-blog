@@ -30,18 +30,33 @@ function App() {
 3. `line` : เก็บ id ของเส้นทางเดินรถระหว่าง 2 สถานีข้างต้น
 
 ```javascript
-const routes = [
-  {
-    from: stationA,
-    to: stationB,
-    line: lineGreen,
-  },
-  {
-    from: stationB,
-    to: stationC,
-    line: lineBlue,
-  },
-];
+// src/App.js
+...
+
+const SIAM = 'CEN',
+  ARI = 'N5',
+  SALADAENG = 'S2';
+
+const SUKHUMVIT0 = '100',
+  SILOMLINE1 = '201';
+function App() {
+  ...
+  function AriToSilom() {
+      const routes = [
+        {
+          from: ARI,
+          to: SIAM,
+          line: SUKHUMVIT0,
+        },
+        {
+          from: SIAM,
+          to: SALADAENG,
+          line: SILOMLINE1,
+        },
+      ];
+  }
+  ...
+}
 ```
 
 ![line-station-relationship](./line-station.jpg)
