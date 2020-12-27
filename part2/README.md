@@ -42,7 +42,7 @@ const SUKHUMVIT0 = '100',
 function App() {
   ...
   function AriToSilom() {
-      const routes = [
+      const tracks = [
         {
           from: ARI,
           to: SIAM,
@@ -105,7 +105,7 @@ export default function nameToCoords(directionsName, station, trainline) {
 }
 
 // src/App.js
-const routes = nameToCoords(
+const tracks = nameToCoords(
   [
     {
       from: ARI,
