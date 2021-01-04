@@ -1,32 +1,33 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { json as jsonRequest } from 'd3-request';
+import { json as jsonRequest } from "d3-request";
 
-import Mapbox from './components/mapbox';
-import filterGeojson from './utils/filterGeojson';
-import nameToCoords from './utils/nameToCoords';
+import Mapbox from "./components/mapbox";
+import filterGeojson from "./utils/filterGeojson";
+import nameToCoords from "./utils/nameToCoords";
+import findPathBetweenStation from "./utils/findPathBetweenStation";
 
-const SIAM = 'CEN',
-  ARI = 'N5',
-  SALADAENG = 'S2';
+const SIAM = "CEN",
+  ARI = "N5",
+  SALADAENG = "S2";
 
-const SUKHUMVIT0 = '100',
-  SILOMLINE1 = '201';
+const SUKHUMVIT0 = "100",
+  SILOMLINE1 = "201";
 function App() {
   const [geodata, setGeodata] = useState({
     station: { features: [] },
     line: { features: [] },
   });
   useEffect(() => {
-    jsonRequest('/data/map.geo.json', function (response) {
+    jsonRequest("/data/map.geo.json", function (response) {
       const data = {};
       data.station = filterGeojson(
         response,
-        (feature) => feature.geometry.type === 'Point'
+        (feature) => feature.geometry.type === "Point"
       );
 
       data.line = filterGeojson(response, (feature) =>
-        feature.geometry.type.includes('LineString')
+        feature.geometry.type.includes("LineString")
       );
       console.log(data);
       setGeodata(data);
@@ -34,7 +35,7 @@ function App() {
   }, []);
 
   function AriToSilom() {
-    const tracks = nameToCoords(
+    const tracks = findPathBetweenStation(
       [
         {
           from: ARI,
