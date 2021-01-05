@@ -53,7 +53,6 @@ function App() {
       geodata.line
     );
     const travelPlan = createTravelPlan(tracks);
-    console.log("travelplan", travelPlan);
     queueCall(travelPlan);
   }
 
