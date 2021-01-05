@@ -1,14 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 
-import mapboxgl from 'mapbox-gl';
+import mapboxgl from "mapbox-gl";
 
-import { BANGKOK_CENTER } from '../config';
-import D3Map from './d3map';
-const MAPSTYLE = 'mapbox://styles/mapbox/dark-v10';
+import { BANGKOK_CENTER } from "../config";
+import D3Map from "./d3map";
+const MAPSTYLE = "mapbox://styles/mapbox/dark-v10";
 const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
 
-let map;
+export let map;
 export default function Mapbox(props) {
   const { geodata } = props;
   const mapRef = useRef(null);
@@ -27,7 +27,7 @@ export default function Mapbox(props) {
 
   useEffect(() => {
     if (!mapRef) return;
-    console.log('rendermap');
+    console.log("rendermap");
     map = new mapboxgl.Map({
       container: mapRef.current,
       style: MAPSTYLE,
@@ -36,9 +36,9 @@ export default function Mapbox(props) {
     });
 
     resizeHandler();
-    window.addEventListener('resize', resizeHandler);
+    window.addEventListener("resize", resizeHandler);
 
-    map.on('move', () => {
+    map.on("move", () => {
       const { lng: longitude, lat: latitude } = map.getCenter();
       const zoom = map.getZoom();
 

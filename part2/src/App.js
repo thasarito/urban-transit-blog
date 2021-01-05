@@ -4,8 +4,8 @@ import { json as jsonRequest } from "d3-request";
 
 import Mapbox from "./components/mapbox";
 import filterGeojson from "./utils/filterGeojson";
-import nameToCoords from "./utils/nameToCoords";
 import findPathBetweenStation from "./utils/findPathBetweenStation";
+import createTravelPlan from "./utils/createTravelPlan";
 
 const SIAM = "CEN",
   ARI = "N5",
@@ -51,7 +51,8 @@ function App() {
       geodata.station,
       geodata.line
     );
-    console.log(tracks);
+    const travelPlan = createTravelPlan(tracks);
+    console.log("travelplan", travelPlan);
   }
 
   return (
