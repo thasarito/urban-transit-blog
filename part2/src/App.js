@@ -6,6 +6,7 @@ import Mapbox from "./components/mapbox";
 import filterGeojson from "./utils/filterGeojson";
 import findPathBetweenStation from "./utils/findPathBetweenStation";
 import createTravelPlan from "./utils/createTravelPlan";
+import queueCall from "./utils/queueCall";
 
 const SIAM = "CEN",
   ARI = "N5",
@@ -53,6 +54,7 @@ function App() {
     );
     const travelPlan = createTravelPlan(tracks);
     console.log("travelplan", travelPlan);
+    queueCall(travelPlan);
   }
 
   return (

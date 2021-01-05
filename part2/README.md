@@ -67,7 +67,7 @@ function App() {
 
 ```javascript
 // src/utils/nameToCoords.js
-import flatten from '@turf/flatten';
+import flatten from "@turf/flatten";
 
 export default function nameToCoords(directionsName, station, trainline) {
   /*
@@ -133,8 +133,8 @@ const tracks = nameToCoords(
 
 ```javascript
 // src/utils/findPathBetweenStation.js
-import findNearestIdx from './findNearestIdx';
-import nameToCoords from './nameToCoords';
+import findNearestIdx from "./findNearestIdx";
+import nameToCoords from "./nameToCoords";
 
 export default (station, line) =>
   function findPathBetweenStation(directions) {
@@ -205,3 +205,5 @@ function createTravelPlan(paths) {
 ## 2.3 สร้างฟังก์ชั่นสำหรับเรียกหลายๆ ฟังก์ชั่นต่อๆ กัน
 
 ในส่วนของการขยับกล้องของ mapbox จะใช้ฟังก์ชั่น `panTo` ซึ่งจะสามารถขยับกล้องได้แค่จากจุดหนึ่งไปอีกจุดหนึ่งเท่านั้นใน 1 eventloop แต่เนื่องจากเราต้องการขยับตามเส้นทางเดินรถ ซึ่งจำนวนครั้งในการเรียกฟังก์ชั่นจะขึ้นอยู่กับจำนวนจุดในเส้นทางเดินรถระหว่างสถานีสองสถานี
+
+จึงจะสร้างฟังก์ชั่นชื่อ `queueCall` ที่รับ
