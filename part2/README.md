@@ -29,6 +29,8 @@ function App() {
 2. `to` : เก็บ id ของสถานีปลายทาง
 3. `line` : เก็บ id ของเส้นทางเดินรถระหว่าง 2 สถานีข้างต้น
 
+โดยในที่นี้จะยกตัวอย่างด้วยการขยับจากสถานีอารีย์ ไปที่สถานีศาลาแดง ซึ่งจะต้องไปเปลี่ยนสายจากสุขุมวิทเป็นสีลมที่สถานีสยาม
+
 ```javascript
 // src/App.js
 ...
@@ -61,7 +63,7 @@ function App() {
 
 ![line-station-relationship](./line-station.jpg)
 
-เริ่มจากสร้างฟังก์ชั่นที่เปลี่ยนจาก `tracks` เป็น จุดบนเส้นทางรถไฟที่เชื่อมระหว่าง `stationA` กับ `stationC`
+เริ่มจากสร้างฟังก์ชั่นที่เปลี่ยนจาก `tracks` เป็น จุดบนเส้นทางรถไฟที่เชื่อมระหว่าง `ARI` กับ `SALADAENG`
 
 1. แปลง `from`, `to`, และ `line` ในแต่ละ `track` ให้เป็น coordinates
 
@@ -70,15 +72,6 @@ function App() {
 import flatten from "@turf/flatten";
 
 export default function nameToCoords(directionsName, station, trainline) {
-  /*
-  [
-    {
-      from: Ari,
-      to: Siam,
-      line: 101
-    }
-  ]
-  */
   const direction = directionsName.map((direction) => {
     const { from, to, line } = direction;
 
@@ -103,76 +96,60 @@ export default function nameToCoords(directionsName, station, trainline) {
 
   return direction;
 }
-
-// src/App.js
-const tracks = nameToCoords(
-  [
-    {
-      from: ARI,
-      to: SIAM,
-      line: SUKHUMVIT0,
-    },
-    {
-      from: SIAM,
-      to: SALADAENG,
-      line: SILOMLINE1,
-    },
-  ],
-  geodata.station,
-  geodata.line
-);
 ```
 
-2. สร้างฟังก์ชั่นเพื่อแปลง `track` ให้กลายเป็นเส้นทางด้วยขั้นตอนไปนี้
+2. สร้างฟังก์ชั่นเพื่อแปลง `track` ให้กลายเป็นเส้นทาง (`Array` ของ `coordinates` ระหว่างสองสถานีนั้นๆ) ด้วยขั้นตอนไปนี้
 
-   1. หา index (`indexA`) ที่ใกล้ที่สุดของสถานี `from` กับจุดต่างๆ ใน `line`
-   2. หา index (`indexB`) ที่ใกล้ที่สุดของสถานี `to` กับจุดต่างๆ ใน `line`
+   1. หา index `indexA` ที่ใกล้ที่สุดของสถานี `from` กับจุดต่างๆ ใน `line`
+   2. หา index `indexB` ที่ใกล้ที่สุดของสถานี `to` กับจุดต่างๆ ใน `line`
    3. คืน `Array` ที่เป็นจุดระหว่าง `indexA` และ `indexB`
 
 3. รวม `path` ที่ได้มาจาก แต่ละ `track` เป็นเส้นเดียวกันด้วย `Array.reduce`
+
+เริ่มจากสร้างฟังก์ชั่น `findNearestIdx` เพื่อใช้หา index ที่ใกล้ที่สุด โดยรับ `position` ปัจจุบันและ `path` ที่เป็น `GeoJSON LineString` แล้วใช้ฟังก์ชั่น `distance` ในการหาระยะทางระหว่างจุดแต่ละจุดใน `LineString` หลังจากนั้นใช้ `minIndex` ในการหา `index` ของจุดที่มีระยะทางสั้นที่สุด
+
+```javascript
+import { minIndex } from "d3-array";
+import distance from "@turf/distance";
+
+export default function findNearestIdx(position, path) {
+  const dist_2 = path.map((routeCoord) => {
+    return distance(position, routeCoord);
+  });
+
+  return minIndex(dist_2);
+}
+```
+
+หลังจากนั้นสร้างฟังก์ชั่น `findPathBetweenStation` สำหรับ...
 
 ```javascript
 // src/utils/findPathBetweenStation.js
 import findNearestIdx from "./findNearestIdx";
 import nameToCoords from "./nameToCoords";
 
-export default (station, line) =>
-  function findPathBetweenStation(directions) {
-    /*
-  directions = [
-    {
-      from: [lat, lon], of Ari Station
-      to: [lat, lon], of Siam Station
-      line: [[lat, lon], ...] (geometry of BTS Green)
-    },
-    {
-      from: Siam,
-      to: Silom,
-      line: [[lat, lon], ...]
-    },
-  ]
-  */
-    const d = nameToCoords(directions, station, line);
-    const paths = d.reduce((paths, direction) => {
-      const { from, to, line } = direction;
+export default function findPathBetweenStation(directions, station, line) {
+  const d = nameToCoords(directions, station, line);
+  const paths = d.reduce((paths, direction) => {
+    const { from, to, line } = direction;
 
-      const fromIdx = findNearestIdx(from, line),
-        toIdx = findNearestIdx(to, line);
+    const fromIdx = findNearestIdx(from, line),
+      toIdx = findNearestIdx(to, line);
 
-      let path = line.slice(fromIdx, toIdx);
+    let path = line.slice(fromIdx, toIdx);
 
-      if (fromIdx > toIdx) {
-        const flip = [...line].reverse();
-        path = flip.slice(line.length - fromIdx, line.length - toIdx);
-      }
-      path[0] = from;
-      path[path.length - 1] = to;
+    if (fromIdx > toIdx) {
+      const flip = [...line].reverse();
+      path = flip.slice(line.length - fromIdx, line.length - toIdx);
+    }
+    path[0] = from;
+    path[path.length - 1] = to;
 
-      return [...paths, ...path];
-    }, []);
+    return [...paths, ...path];
+  }, []);
 
-    return paths;
-  };
+  return paths;
+}
 ```
 
 ## 2.2 หาระยะทางระหว่างจุดที่ต่อกัน แล้วคำนวณเวลา
@@ -181,24 +158,35 @@ export default (station, line) =>
 
 ```javascript
 // src/utils/createTravelPlan.js
+import distance from "@turf/distance";
+
+import { map } from "../components/mapbox";
 
 const VELOCITY = 1.5e-3;
-function createTravelPlan(paths) {
+export default function createTravelPlan(paths) {
   const plan = paths.map((currentCoordinate, i, coordinates) => {
     const previousCoordinate = coordinates[i - 1];
-    if (!previousCoordinates) return { fn: () => {}, t: 1 };
+    if (!previousCoordinate)
+      return {
+        movemap: () => {
+          map.flyTo({ center: currentCoordinate, zoom: 16 });
+        },
+        t: 3000,
+      };
 
-    const DISTANCE = distance(currentCoordinates, previousCoordinate),
+    const DISTANCE = distance(currentCoordinate, previousCoordinate),
       TIME = DISTANCE / VELOCITY;
 
     function movemap() {
-      map.panTo(coordinate, { duration: TIME, easing: (t) => t });
+      map.panTo(currentCoordinate, { duration: TIME, easing: (t) => t });
     }
     return {
       movemap,
-      t: time,
+      t: TIME,
     };
   });
+
+  return plan;
 }
 ```
 
@@ -227,4 +215,33 @@ async function queueCall(arr) {
 }
 
 export default queueCall;
+```
+
+## 3. Putting it all together
+
+หลังจากนั้นใน `App.js`
+
+```javascript
+// src/App.js
+
+function AriToSilom() {
+  const tracks = findPathBetweenStation(
+    [
+      {
+        from: ARI,
+        to: SIAM,
+        line: SUKHUMVIT0,
+      },
+      {
+        from: SIAM,
+        to: SALADAENG,
+        line: SILOMLINE1,
+      },
+    ],
+    geodata.station,
+    geodata.line
+  );
+  const travelPlan = createTravelPlan(tracks);
+  queueCall(travelPlan);
+}
 ```
