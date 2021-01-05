@@ -206,4 +206,25 @@ function createTravelPlan(paths) {
 
 ในส่วนของการขยับกล้องของ mapbox จะใช้ฟังก์ชั่น `panTo` ซึ่งจะสามารถขยับกล้องได้แค่จากจุดหนึ่งไปอีกจุดหนึ่งเท่านั้นใน 1 eventloop แต่เนื่องจากเราต้องการขยับตามเส้นทางเดินรถ ซึ่งจำนวนครั้งในการเรียกฟังก์ชั่นจะขึ้นอยู่กับจำนวนจุดในเส้นทางเดินรถระหว่างสถานีสองสถานี
 
-จึงจะสร้างฟังก์ชั่นชื่อ `queueCall` ที่รับ
+จึงจะสร้างฟังก์ชั่นชื่อ `queueCall` ที่รับ `travelPlan` ไปเพื่อเรียน `movemap` ต่อๆ กัน
+
+```javascript
+// src/utils/queueCall.js
+
+async function queueCall(arr) {
+  function delay(t) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve();
+      }, t);
+    });
+  }
+
+  for (let { movemap, t } of arr) {
+    movemap();
+    await delay(t);
+  }
+}
+
+export default queueCall;
+```
