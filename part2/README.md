@@ -121,7 +121,7 @@ export default function findNearestIdx(position, path) {
 }
 ```
 
-หลังจากนั้นสร้างฟังก์ชั่น `findPathBetweenStation` สำหรับ...
+หลังจากนั้นสร้างฟังก์ชั่น `findPathBetweenStation` สำหรับรวมทั้งเรียกใช้ 3 ฟังก์ชั่นด้านบน และทำสเตปที่ 2.1.3 ไปด้วย โดยนำ `path` มารวมกัน ด้วย `reduce`
 
 ```javascript
 // src/utils/findPathBetweenStation.js
