@@ -57,12 +57,16 @@ function App() {
     queueCall(travelPlan);
   }
 
+  function animateMap() {}
+
   return (
     <div className="App">
       <div className="controller">
+        <h2>แสดงแผนที่ถึงปี {mapYear}</h2>
+        <button onClick={animateMap}>Animate Map</button>
         <button onClick={AriToSilom}>Ari to Silom</button>
       </div>
-      <Mapbox geodata={geodata} />
+      <Mapbox geodata={geodata} mapYear={mapYear} />
       <style jsx>{`
         .App {
           width: 100vw;
@@ -78,10 +82,15 @@ function App() {
           -webkit-backdrop-filter: contrast(0.9);
           backdrop-filter: contrast(0.9);
           width: 30rem;
-          height: 10rem;
+          height: 80vh;
           display: flex;
           justify-content: center;
           align-items: center;
+          flex-flow: column nowrap;
+        }
+
+        .controller h2 {
+          color: white;
         }
 
         .controller button {
@@ -90,6 +99,7 @@ function App() {
           background: lightseagreen;
           border: 1px solid white;
           color: white;
+          margin: 5rem 0;
         }
       `}</style>
     </div>
