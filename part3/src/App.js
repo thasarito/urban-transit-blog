@@ -15,6 +15,7 @@ const SIAM = "CEN",
 const SUKHUMVIT0 = "100",
   SILOMLINE1 = "201";
 function App() {
+  const [mapYear, setMapYear] = useState(2563);
   const [geodata, setGeodata] = useState({
     station: { features: [] },
     line: { features: [] },
