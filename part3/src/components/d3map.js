@@ -1,11 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-import { geoMercator, geoPath } from 'd3-geo';
-import TrainStation from './trainStation';
-import TrainLine from './trainLine';
+import { geoMercator, geoPath } from "d3-geo";
+import TrainStation from "./trainStation";
+import TrainLine from "./trainLine";
 
 export default function D3Map(props) {
-  const { geodata, dimension, viewport } = props;
+  const { geodata, dimension, viewport, mapYear } = props;
 
   const { projection, path, scaler } = useMemo(() => {
     const { latitude, longitude, zoom } = viewport;
@@ -25,10 +25,24 @@ export default function D3Map(props) {
   return (
     <svg>
       {geodata.line.features.map(function (feature) {
-        return <TrainLine feature={feature} path={path} />;
+        return (
+          <TrainLine
+            key={feature.properties.id}
+            mapYear={mapYear}
+            feature={feature}
+            path={path}
+          />
+        );
       })}
       {geodata.station.features.map(function (feature) {
-        return <TrainStation feature={feature} projection={projection} />;
+        return (
+          <TrainStation
+            key={feature.properties.code}
+            mapYear={mapYear}
+            feature={feature}
+            projection={projection}
+          />
+        );
       })}
       <style jsx>{`
         svg {

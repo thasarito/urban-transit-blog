@@ -10,7 +10,7 @@ mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
 
 export let map;
 export default function Mapbox(props) {
-  const { geodata } = props;
+  const { geodata, mapYear } = props;
   const mapRef = useRef(null);
   const [viewport, setViewport] = useState({
     longitude: BANGKOK_CENTER[0],
@@ -55,7 +55,12 @@ export default function Mapbox(props) {
   return (
     <div className="train-map">
       <div className="mapbox" ref={mapRef}>
-        <D3Map geodata={geodata} dimension={dimension} viewport={viewport} />
+        <D3Map
+          geodata={geodata}
+          mapYear={mapYear}
+          dimension={dimension}
+          viewport={viewport}
+        />
       </div>
       <style jsx>{`
         .train-map {
