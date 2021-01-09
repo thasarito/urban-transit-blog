@@ -1,16 +1,16 @@
 export default function TrainStation(props) {
+  const { feature, projection, mapYear } = props;
+
   const {
-    feature: {
-      geometry: { coordinates },
-    },
-    projection,
-  } = props;
+    properties: { finish },
+    geometry: { coordinates },
+  } = feature;
 
   const [cx, cy] = projection(coordinates);
 
   return (
     <g className="station">
-      <circle cx={cx} cy={cy} r={3} fill="white" />
+      {mapYear >= finish && <circle cx={cx} cy={cy} r={3} fill="white" />}
     </g>
   );
 }
