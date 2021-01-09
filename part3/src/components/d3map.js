@@ -1,8 +1,11 @@
 import { useMemo } from "react";
 
-import { geoMercator, geoPath } from "d3-geo";
+import { geoLength, geoMercator, geoPath } from "d3-geo";
 import TrainStation from "./trainStation";
 import TrainLine from "./trainLine";
+import findLineIDByStationCode from "../utils/findLineIDByStationCode";
+import findNearestIdx from "../utils/findNearestIdx";
+import flatten from "@turf/flatten";
 
 export default function D3Map(props) {
   const { geodata, dimension, viewport, mapYear } = props;
@@ -35,12 +38,43 @@ export default function D3Map(props) {
         );
       })}
       {geodata.station.features.map(function (feature) {
+        let delay = 1;
+        const lineID = findLineIDByStationCode(feature.properties.code);
+        if (lineID) {
+          const lineFeature = flatten(
+            geodata.line.features.find(
+              (feature) => +feature.properties.id === lineID
+            )
+          );
+
+          if (lineFeature) {
+            const nearestIdx = findNearestIdx(
+              feature.geometry.coordinates,
+              lineFeature.features[0].geometry.coordinates
+            );
+            const pathToStationLineString = {
+              type: "Feature",
+              geometry: {
+                type: "LineString",
+                coordinates: lineFeature.features[0].geometry.coordinates.slice(
+                  0,
+                  nearestIdx
+                ),
+              },
+            };
+            const pathToStationDistance = geoLength(pathToStationLineString);
+            const totalDistance = geoLength(lineFeature.features[0]);
+            delay = pathToStationDistance / totalDistance;
+          }
+        }
+
         return (
           <TrainStation
             key={feature.properties.code}
             mapYear={mapYear}
             feature={feature}
             projection={projection}
+            delay={delay}
           />
         );
       })}
