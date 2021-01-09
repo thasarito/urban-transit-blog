@@ -1,13 +1,20 @@
 export default function TrainLine(props) {
-  const { feature, path } = props;
+  const { feature, path, mapYear } = props;
 
-  const { stroke } = feature.properties;
+  const { stroke, end } = feature.properties;
 
   const definition = path(feature);
 
   return (
     <g className="line">
-      <path d={definition} fill="transparent" stroke={stroke} strokeWidth={3} />
+      {mapYear >= end && (
+        <path
+          d={definition}
+          fill="transparent"
+          stroke={stroke}
+          strokeWidth={3}
+        />
+      )}
     </g>
   );
 }
