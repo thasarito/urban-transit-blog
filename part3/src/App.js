@@ -57,7 +57,18 @@ function App() {
     queueCall(travelPlan);
   }
 
-  function animateMap() {}
+  function animateMap() {
+    const allYear = geodata.line.features.map(
+      (feature) => feature.properties.end
+    );
+    const unique = [...new Set(allYear)].sort();
+
+    const queue = unique.map((year) => ({
+      movemap: () => setMapYear(year),
+      t: 1750,
+    }));
+    queueCall(queue);
+  }
 
   return (
     <div className="App">
@@ -100,6 +111,7 @@ function App() {
           border: 1px solid white;
           color: white;
           margin: 5rem 0;
+          cursor: pointer;
         }
       `}</style>
     </div>
