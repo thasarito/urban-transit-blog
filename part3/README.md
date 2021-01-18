@@ -53,6 +53,8 @@ function App() {
 }
 ```
 
+หลังจากนั้นใช้ `mapYear` ที่ส่งมาให้ `<TrainLine />` มาเป็น condition ในการ `render` `path` ถ้า `mapYear >= end` และเพิ่ม `animate` class สำหรับสร้าง `animation` ตอนที่ `path` `render` เมื่อ `mapYear` ถึงปีที่รถไฟสายนั้นๆ สร้างเสร็จ
+
 ```javascript
 // src/components/trainLine.js
 import { useLayoutEffect, useRef, useState } from "react";
@@ -102,6 +104,8 @@ export default function TrainLine(props) {
 }
 ```
 
+เช่นเดียวกันกับด้านบน เราสามารถทำแบบเดียวกันกับ `<TrainStation />` component ได้ แต่สถานีต่างๆ จะโผล่ขึ้นมาพร้อมๆ กัน แต่เราอยากให้สถานีค่อยๆ ขึ้นมาตามเส้นรถไฟฟ้าที่กำลังขยับไป
+
 ```javascript
 // src/components/trainStation.js
 export default function TrainStation(props) {
@@ -121,6 +125,8 @@ export default function TrainStation(props) {
   );
 }
 ```
+
+ณ ตอนนี้สถานีกับสายรถไฟฟ้าที่เราเก็บไว้ใน `GeoJSON` ไม่มีความเชื่อมโยงกัน สถานีไม่รู้ว่าตัวเองอยู่ในสายไหน และสายต่างๆ ก็ไม่รู้ว่าสถานีใดบ้างที่อยู่ในสายนั้นๆ ในขั้นแรกเราจึงสร้างไฟล์ที่จะเชื่อมโยงสถานีกับเส้นทางเข้าด้วยกัน
 
 ```javascript
 // src/utils/lineStationRelationship.js
@@ -154,6 +160,8 @@ export default {
 }
 ```
 
+หลังจากนั้นสร้างฟังก์ชั่นสำหรับหาสายที่สถานีนั้นๆ ตั้งอยู่
+
 ```javascript
 // src/utils/findLineIDByStationCode.js
 import lineStationRelationship from "./lineStationRelationship";
@@ -167,6 +175,8 @@ export default function findLineIDByStationCode(code) {
 }
 ```
 
+และสุดท้ายคำนวณสัดส่วนของระยะทางระหว่างจุดเริ่มต้นของสายจนถึงสถานี กับ ระยะทางทั้งหมดของสายนั้นๆ เพื่อใช้เป็น `animation-delay` ของ `animation` เมื่อจุดนั้นถึงเวลา `render`
+
 ```javascript
 // src/components/d3map.js
 ...
@@ -176,7 +186,7 @@ export default function D3Map(props) {
     ...
   {geodata.station.features.map(function (feature) {
         let delay = 1;
-        const lineID = findLineIDByStationCode(feature.properties.code);
+        const lineID = findLineIDByStationCode(feature.properties.code); // หาสายที่สถานีนั้นตั้งอยู่
         if (lineID) {
           const lineFeature = flatten(
             geodata.line.features.find(
@@ -198,10 +208,10 @@ export default function D3Map(props) {
                   nearestIdx
                 ),
               },
-            };
-            const pathToStationDistance = geoLength(pathToStationLineString);
-            const totalDistance = geoLength(lineFeature.features[0]);
-            delay = pathToStationDistance / totalDistance;
+            }; // สร้าง `Feature` ใหม่ของเส้นที่ลากจากจุดเริ่มต้นของสายมาจนถึงสถานี
+            const pathToStationDistance = geoLength(pathToStationLineString); // คำนวณระยะทางระหว่างจุดเริ่มต้นถึงสถานี
+            const totalDistance = geoLength(lineFeature.features[0]); // คำนวณความยาวรวมของเส้นทางนั้นๆ
+            delay = pathToStationDistance / totalDistance; // คำนวณสัดส่วนของทั้งสองค่าด้านบนเพื่อใช้เป็นการ delay
           }
         }
 
@@ -220,10 +230,12 @@ export default function D3Map(props) {
 }
 ```
 
+เมื่อได้ `delay` มาแล้วก็ส่งไปให้ `<TrainStation />` ไปเพื่อใช้ในการสร้าง `animation`
+
 ```javascript
 // src/components/trainStation.js
 export default function TrainStation(props) {
-  const { feature, projection, mapYear, delay } = props;
+  const { feature, projection, mapYear, delay } = props; // รับ delay จาก props
 
   const {
     properties: { finish },
@@ -239,7 +251,7 @@ export default function TrainStation(props) {
           className="train-station"
           r={3}
           style={{
-            animationDelay: `${delay * 1.5}s`,
+            animationDelay: `${delay * 1.5}s`, // เพิ่ม animation-delay ตาม delay ที่รับมา
           }}
           fill="white"
         />
@@ -253,6 +265,7 @@ export default function TrainStation(props) {
           transform: scale(0, 0);
         }
         @keyframes pop {
+          // เพิ่ม animation
           0% {
             transform: scale(0, 0);
           }
