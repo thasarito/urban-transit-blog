@@ -121,3 +121,159 @@ export default function TrainStation(props) {
   );
 }
 ```
+
+```javascript
+// src/utils/lineStationRelationship.js
+export default {
+   {
+    line: 101,
+    station: ["BL13", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "CEN"],
+  },
+  {
+    line: 201,
+    station: [
+      "W1",
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6",
+      "E7",
+      "E8",
+      "E9",
+      "S1",
+      "BL26",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+    ],
+  },
+  ...
+}
+```
+
+```javascript
+// src/utils/findLineIDByStationCode.js
+import lineStationRelationship from "./lineStationRelationship";
+
+export default function findLineIDByStationCode(code) {
+  for (const { line, station } of lineStationRelationship) {
+    if (station.includes(code)) {
+      return line;
+    }
+  }
+}
+```
+
+```javascript
+// src/components/d3map.js
+...
+export default function D3Map(props) {
+  ...
+  return (
+    ...
+  {geodata.station.features.map(function (feature) {
+        let delay = 1;
+        const lineID = findLineIDByStationCode(feature.properties.code);
+        if (lineID) {
+          const lineFeature = flatten(
+            geodata.line.features.find(
+              (feature) => +feature.properties.id === lineID
+            )
+          );
+
+          if (lineFeature) {
+            const nearestIdx = findNearestIdx(
+              feature.geometry.coordinates,
+              lineFeature.features[0].geometry.coordinates
+            );
+            const pathToStationLineString = {
+              type: "Feature",
+              geometry: {
+                type: "LineString",
+                coordinates: lineFeature.features[0].geometry.coordinates.slice(
+                  0,
+                  nearestIdx
+                ),
+              },
+            };
+            const pathToStationDistance = geoLength(pathToStationLineString);
+            const totalDistance = geoLength(lineFeature.features[0]);
+            delay = pathToStationDistance / totalDistance;
+          }
+        }
+
+        return (
+          <TrainStation
+            key={feature.properties.code}
+            mapYear={mapYear}
+            feature={feature}
+            projection={projection}
+            delay={delay}
+          />
+        );
+      })}
+      ...
+  )
+}
+```
+
+```javascript
+// src/components/trainStation.js
+export default function TrainStation(props) {
+  const { feature, projection, mapYear, delay } = props;
+
+  const {
+    properties: { finish },
+    geometry: { coordinates },
+  } = feature;
+
+  const [x, y] = projection(coordinates);
+
+  return (
+    <g className="station" transform={`translate(${x}, ${y})`}>
+      {mapYear >= finish && (
+        <circle
+          className="train-station"
+          r={3}
+          style={{
+            animationDelay: `${delay * 1.5}s`,
+          }}
+          fill="white"
+        />
+      )}
+      <style jsx>{`
+        .train-station {
+          animation-name: pop;
+          animation-duration: 1s;
+          animation-timing-function: linear;
+          animation-fill-mode: forwards;
+          transform: scale(0, 0);
+        }
+        @keyframes pop {
+          0% {
+            transform: scale(0, 0);
+          }
+          20% {
+            transform: scale(1.1, 1.1);
+          }
+          40% {
+            transform: scale(0.98, 0.98);
+          }
+          60% {
+            transform: scale(1.05, 1.05);
+          }
+          80% {
+            transform: scale(1.01, 1.01);
+          }
+          100% {
+            transform: scale(1, 1);
+          }
+        }
+      `}</style>
+    </g>
+  );
+}
+```
